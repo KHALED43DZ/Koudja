@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#0d1117"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>الحماية المدنية — نظام تسيير الفصائل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:#0d1117;color:#e6edf3;font-family:'Cairo','Segoe UI',sans-serif;direction:rtl;min-height:100vh;overflow-x:hidden;}
+#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;}
+button{font-family:'Cairo','Segoe UI',sans-serif;cursor:pointer;}
+input,select{font-family:'Cairo','Segoe UI',sans-serif;}
+select option{background:#0d1117;color:#e6edf3;}
+.hidden{display:none!important;}
+/* scrollbar */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:#0d1117;}
+::-webkit-scrollbar-thumb{background:#30363d;border-radius:4px;}
+/* header */
+#header{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;transition:background 0.3s,box-shadow 0.3s;}
+.header-title{font-size:17px;font-weight:700;letter-spacing:0.3px;}
+.header-sub{font-size:11px;opacity:0.85;margin-top:2px;}
+.header-badge{background:rgba(255,255,255,0.2);border-radius:20px;padding:4px 12px;font-size:13px;font-weight:600;backdrop-filter:blur(4px);}
+/* nav */
+#nav{background:#161b22;border-top:1px solid #30363d;display:flex;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:100;}
+.nav-btn{flex:1;padding:10px 4px 8px;background:none;border:none;border-top:2px solid transparent;color:#8b949e;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;transition:color 0.2s,border-color 0.2s;}
+.nav-btn.active{color:var(--squad-color);border-top-color:var(--squad-color);}
+.nav-icon{font-size:18px;}
+/* pages */
+.page{display:none;padding:16px 16px 80px;}
+.page.active{display:block;}
+/* cards */
+.card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:16px;margin-bottom:12px;}
+.card-title{font-size:14px;font-weight:700;margin-bottom:12px;color:#e6edf3;}
+.section-title{font-size:11px;color:#8b949e;margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+/* buttons */
+.btn{border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;color:#fff;transition:opacity 0.15s;}
+.btn:active{opacity:0.8;}
+.btn-full{width:100%;}
+.btn-flex{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;font-size:14px;border-radius:10px;}
+/* inputs */
+.input-field{background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;padding:8px 12px;font-size:13px;width:100%;margin-bottom:8px;outline:none;}
+.input-field:focus{border-color:#457b9d;}
+/* tags */
+.tag{display:inline-block;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;}
+/* dot */
+.dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;display:inline-block;}
+/* rows */
+.member-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#0d1117;border-radius:8px;margin-bottom:6px;border:1px solid #30363d;transition:background 0.15s;}
+.member-row.dragging{background:#21262d;opacity:0.7;}
+.member-row.dragover{background:#1d3a5c;border-color:#457b9d;}
+.drag-handle{color:#484f58;cursor:grab;font-size:14px;user-select:none;}
+.member-info{flex:1;min-width:0;}
+.member-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* presence btn */
+.presence-btn{border-radius:6px;padding:3px 8px;font-size:11px;border:1px solid;cursor:pointer;white-space:nowrap;}
+/* delete btn */
+.delete-btn{background:none;border:none;color:#e63946;font-size:16px;padding:0 4px;flex-shrink:0;}
+/* squad tabs */
+.squad-tabs{display:flex;gap:8px;margin-bottom:16px;}
+.squad-tab{flex:1;padding:10px 0;border-radius:10px;border:none;font-weight:700;font-size:14px;transition:all 0.2s;color:#8b949e;background:#161b22;}
+/* add form */
+.add-form{background:#0d1117;border-radius:8px;padding:12px;margin-bottom:12px;border:1px solid #30363d;}
+.form-row{display:flex;gap:8px;}
+/* calendar */
+.cal-banner{border:none;text-align:center;margin-bottom:16px;}
+.cal-banner-label{font-size:12px;opacity:0.85;margin-bottom:4px;}
+.cal-banner-sq{font-size:36px;font-weight:800;}
+.cal-banner-date{font-size:13px;opacity:0.85;margin-top:4px;}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cal-nav-title{font-weight:700;font-size:15px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-day-header{text-align:center;font-size:10px;color:#8b949e;font-weight:600;padding:4px 0;}
+.cal-day{border-radius:6px;padding:6px 2px;text-align:center;font-size:12px;font-weight:500;color:#fff;border:2px solid transparent;cursor:default;}
+.cal-day.today{font-weight:800;border-color:#fff;}
+.cal-day-num{line-height:1.2;}
+.cal-day-sq{font-size:9px;opacity:0.85;}
+.cal-legend{display:flex;gap:12px;margin-top:12px;justify-content:center;}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#8b949e;}
+.legend-dot{width:12px;height:12px;border-radius:3px;}
+/* distribution */
+.dist-vehicle{background:#0d1117;border:1px solid #30363d;border-radius:10px;padding:12px;margin-bottom:10px;}
+.dist-vehicle-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.crew-wrap{display:flex;flex-wrap:wrap;gap:6px;}
+.crew-chip{display:flex;align-items:center;gap:4px;background:#161b22;border:1px solid #30363d;border-radius:6px;padding:4px 8px;}
+.crew-name{font-size:12px;}
+.crew-rank{font-size:10px;}
+.guard-row{display:flex;align-items:center;gap:10px;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:8px 12px;margin-bottom:6px;}
+.guard-num{color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;min-width:28px;text-align:center;}
+.guard-info{flex:1;}
+.guard-period{font-size:12px;font-weight:600;}
+.guard-time{font-size:10px;color:#8b949e;}
+.guard-person{display:flex;align-items:center;gap:4px;}
+/* reports */
+.stats-row{display:flex;gap:8px;margin-bottom:12px;}
+.stat-box{flex:1;background:#0d1117;border-radius:8px;padding:12px;text-align:center;border:1px solid #30363d;}
+.stat-num{font-size:24px;font-weight:800;}
+.stat-label{font-size:11px;color:#8b949e;}
+/* modal */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;padding:24px;}
+#modal-overlay.show{display:flex;}
+.modal-box{background:#161b22;border-radius:16px;padding:24px;width:100%;max-width:320px;border:1px solid #30363d;text-align:center;}
+.modal-icon{font-size:32px;margin-bottom:12px;}
+.modal-title{font-weight:700;font-size:15px;margin-bottom:8px;}
+.modal-msg{color:#8b949e;font-size:13px;margin-bottom:20px;}
+.modal-btns{display:flex;gap:8px;}
+.modal-btn{flex:1;padding:10px;border-radius:8px;border:none;font-size:13px;font-weight:600;font-family:'Cairo',sans-serif;cursor:pointer;color:#fff;}
+/* vehicle row */
+.vehicle-row{display:flex;align-items:center;gap:8px;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:8px 12px;margin-bottom:6px;}
+.vehicle-icon{font-size:18px;}
+.vehicle-name{flex:1;font-size:13px;font-weight:600;}
+/* scrollable content area */
+.page-content-scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- HEADER -->
+  <div id="header">
+    <div>
+      <div class="header-title">⛑️ الحماية المدنية</div>
+      <div class="header-sub">نظام تسيير الفصائل</div>
+    </div>
+    <div class="header-badge" id="header-badge">الفصيلة A 🔥</div>
+  </div>
+
+  <!-- PAGES -->
+  <div id="page-calendar" class="page active"></div>
+  <div id="page-members" class="page"></div>
+  <div id="page-vehicles" class="page"></div>
+  <div id="page-distribution" class="page"></div>
+  <div id="page-reports" class="page"></div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="nav">
+    <button class="nav-btn active" onclick="navigate('calendar')">
+      <span class="nav-icon">📅</span><span>التقويم</span>
+    </button>
+    <button class="nav-btn" onclick="navigate('members')">
+      <span class="nav-icon">👥</span><span>الأفراد</span>
+    </button>
+    <button class="nav-btn" onclick="navigate('vehicles')">
+      <span class="nav-icon">🚒</span><span>الآليات</span>
+    </button>
+    <button class="nav-btn" onclick="navigate('distribution')">
+      <span class="nav-icon">🔄</span><span>التوزيع</span>
+    </button>
+    <button class="nav-btn" onclick="navigate('reports')">
+      <span class="nav-icon">📊</span><span>التقارير</span>
+    </button>
+  </nav>
+
+  <!-- DELETE MODAL -->
+  <div id="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-icon">⚠️</div>
+      <div class="modal-title">تأكيد الحذف</div>
+      <div class="modal-msg" id="modal-msg">هل أنت متأكد؟</div>
+      <div class="modal-btns">
+        <button class="modal-btn" style="background:#e63946" onclick="confirmDelete()">حذف</button>
+        <button class="modal-btn" style="background:#30363d" onclick="closeModal()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+const SQUADRONS = ['A','B','C'];
+const SQ_COLORS = {
+  A:{bg:'#e63946',light:'#ff6b7a',dark:'#c1121f'},
+  B:{bg:'#1d6fa4',light:'#4a9fd4',dark:'#0d4f7a'},
+  C:{bg:'#2d9e4f',light:'#5eca78',dark:'#1a6e33'}
+};
+const RANKS = [
+  {id:'lieutenant', label:'ملازم',       color:'#f4a261'},
+  {id:'sergeant',   label:'رقيب',        color:'#e76f51'},
+  {id:'corporal',   label:'عريف',        color:'#457b9d'},
+  {id:'agent',      label:'عون',         color:'#6c757d'},
+  {id:'driver_light',label:'سائق خفيف', color:'#2a9d8f'},
+  {id:'driver_heavy',label:'سائق ثقيل', color:'#e9c46a'},
+];
+const VEH_TYPES = [
+  {id:'vl',        label:'سيارة VL',      icon:'🚗', color:'#457b9d'},
+  {id:'ambulance', label:'سيارة إسعاف',  icon:'🚑', color:'#e63946'},
+  {id:'truck',     label:'شاحنة تدخل',   icon:'🚒', color:'#e76f51'},
+];
+const GUARD_PERIODS = [
+  {id:1,label:'الفترة 1',time:'08:00 - 10:00'},
+  {id:2,label:'الفترة 2',time:'10:00 - 12:00'},
+  {id:3,label:'الفترة 3',time:'12:00 - 14:00'},
+  {id:4,label:'الفترة 4',time:'14:00 - 16:00'},
+  {id:5,label:'الفترة 5',time:'16:00 - 18:00'},
+  {id:6,label:'الفترة 6',time:'18:00 - 20:00'},
+];
+const GUARD_ORDER = [1,6,2,3,4,5];
+const MONTH_AR = ['جانفي','فيفري','مارس','أفريل','ماي','جوان','جويلية','أوت','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const DAY_AR = ['إث','ثل','أر','خم','جم','سب','أح'];
+const BASE_DATE = new Date(2025,0,1);
+
+// Initial members: per squadron 1 lieutenant, 4 sergeants, 7 corporals, 6 agents, 5 driver_light, 5 driver_heavy
+let STATE = {
+  page: 'calendar',
+  selectedSq: 'A',
+  calMonth: new Date(),
+  members: {
+    A:[
+      {id:'a1', name:'النقيب محمد أمين',    rank:'lieutenant',  present:true},
+      {id:'a2', name:'كريم بن عمر',         rank:'sergeant',    present:true},
+      {id:'a3', name:'عمر بوعلام',           rank:'sergeant',    present:true},
+      {id:'a4', name:'رابح مسعود',           rank:'sergeant',    present:true},
+      {id:'a5', name:'حسين زروق',            rank:'sergeant',    present:true},
+      {id:'a6', name:'يوسف حداد',            rank:'corporal',    present:true},
+      {id:'a7', name:'بلال لحلو',            rank:'corporal',    present:true},
+      {id:'a8', name:'نجيب سالم',            rank:'corporal',    present:true},
+      {id:'a9', name:'فارس تومي',            rank:'corporal',    present:true},
+      {id:'a10',name:'وليد عطية',            rank:'corporal',    present:true},
+      {id:'a11',name:'أنيس دراجي',           rank:'corporal',    present:true},
+      {id:'a12',name:'صلاح بوكر',            rank:'corporal',    present:true},
+      {id:'a13',name:'رضا قاسم',             rank:'agent',       present:true},
+      {id:'a14',name:'إياد منصور',           rank:'agent',       present:true},
+      {id:'a15',name:'طارق هلال',            rank:'agent',       present:true},
+      {id:'a16',name:'زيد بريك',             rank:'agent',       present:true},
+      {id:'a17',name:'ماجد سعدي',            rank:'agent',       present:true},
+      {id:'a18',name:'إسلام فريد',           rank:'agent',       present:true},
+      {id:'a19',name:'علي بوزيد',            rank:'driver_light',present:true},
+      {id:'a20',name:'سامي خالد',            rank:'driver_light',present:true},
+      {id:'a21',name:'رمزي حسين',            rank:'driver_light',present:true},
+      {id:'a22',name:'زكريا باية',           rank:'driver_light',present:true},
+      {id:'a23',name:'أمين عبدو',            rank:'driver_light',present:true},
+      {id:'a24',name:'حمزة درار',            rank:'driver_heavy',present:true},
+      {id:'a25',name:'نور الدين بلحاج',      rank:'driver_heavy',present:true},
+      {id:'a26',name:'عادل جمال',            rank:'driver_heavy',present:true},
+      {id:'a27',name:'مراد بن علي',          rank:'driver_heavy',present:true},
+      {id:'a28',name:'سيف الدين قويدر',      rank:'driver_heavy',present:true},
+    ],
+    B:[
+      {id:'b1', name:'النقيب حمزة بريك',     rank:'lieutenant',  present:true},
+      {id:'b2', name:'سامي عطية',            rank:'sergeant',    present:true},
+      {id:'b3', name:'خالد تومي',            rank:'sergeant',    present:true},
+      {id:'b4', name:'فيصل مسعود',           rank:'sergeant',    present:true},
+      {id:'b5', name:'جمال بوعلام',          rank:'sergeant',    present:true},
+      {id:'b6', name:'رمزي خالد',            rank:'corporal',    present:true},
+      {id:'b7', name:'إسماعيل حداد',         rank:'corporal',    present:true},
+      {id:'b8', name:'لخضر سالم',            rank:'corporal',    present:true},
+      {id:'b9', name:'نبيل هلال',            rank:'corporal',    present:true},
+      {id:'b10',name:'كمال فريد',            rank:'corporal',    present:true},
+      {id:'b11',name:'وسيم باية',            rank:'corporal',    present:true},
+      {id:'b12',name:'ياسر بوكر',            rank:'corporal',    present:true},
+      {id:'b13',name:'مراد جمال',            rank:'agent',       present:true},
+      {id:'b14',name:'إياد حسين',            rank:'agent',       present:true},
+      {id:'b15',name:'طارق عبدو',            rank:'agent',       present:true},
+      {id:'b16',name:'عيسى قاسم',            rank:'agent',       present:true},
+      {id:'b17',name:'بلال درار',            rank:'agent',       present:true},
+      {id:'b18',name:'أحمد زروق',            rank:'agent',       present:true},
+      {id:'b19',name:'زيد منصور',            rank:'driver_light',present:true},
+      {id:'b20',name:'رياض بريك',            rank:'driver_light',present:true},
+      {id:'b21',name:'عمر سعدي',             rank:'driver_light',present:true},
+      {id:'b22',name:'ليث عطية',             rank:'driver_light',present:true},
+      {id:'b23',name:'أنس بلحاج',            rank:'driver_light',present:true},
+      {id:'b24',name:'ياسين درار',           rank:'driver_heavy',present:true},
+      {id:'b25',name:'صابر قويدر',           rank:'driver_heavy',present:true},
+      {id:'b26',name:'حسام بن علي',          rank:'driver_heavy',present:true},
+      {id:'b27',name:'رشيد جمال',            rank:'driver_heavy',present:true},
+      {id:'b28',name:'منير حداد',            rank:'driver_heavy',present:true},
+    ],
+    C:[
+      {id:'c1', name:'النقيب سيف الدين',     rank:'lieutenant',  present:true},
+      {id:'c2', name:'نور الدين بلحاج',      rank:'sergeant',    present:true},
+      {id:'c3', name:'عبد الرحمن قاسم',      rank:'sergeant',    present:true},
+      {id:'c4', name:'توفيق بوعلام',          rank:'sergeant',    present:true},
+      {id:'c5', name:'شريف مسعود',            rank:'sergeant',    present:true},
+      {id:'c6', name:'عادل باية',             rank:'corporal',    present:true},
+      {id:'c7', name:'ماجد فريد',             rank:'corporal',    present:true},
+      {id:'c8', name:'نذير سالم',             rank:'corporal',    present:true},
+      {id:'c9', name:'هيثم تومي',             rank:'corporal',    present:true},
+      {id:'c10',name:'عزيز دراجي',            rank:'corporal',    present:true},
+      {id:'c11',name:'سفيان حداد',            rank:'corporal',    present:true},
+      {id:'c12',name:'ربيع عطية',             rank:'corporal',    present:true},
+      {id:'c13',name:'زكريا هلال',            rank:'agent',       present:true},
+      {id:'c14',name:'إسلام بوكر',            rank:'agent',       present:true},
+      {id:'c15',name:'وائل قويدر',            rank:'agent',       present:true},
+      {id:'c16',name:'ثابت جمال',             rank:'agent',       present:true},
+      {id:'c17',name:'لؤي بن علي',            rank:'agent',       present:true},
+      {id:'c18',name:'صهيب منصور',            rank:'agent',       present:true},
+      {id:'c19',name:'خالد سعدي',             rank:'driver_light',present:true},
+      {id:'c20',name:'نعيم درار',             rank:'driver_light',present:true},
+      {id:'c21',name:'فوزي زروق',             rank:'driver_light',present:true},
+      {id:'c22',name:'بشير عبدو',             rank:'driver_light',present:true},
+      {id:'c23',name:'ياسين بريك',            rank:'driver_light',present:true},
+      {id:'c24',name:'أمين بلحاج',            rank:'driver_heavy',present:true},
+      {id:'c25',name:'محسن حسين',             rank:'driver_heavy',present:true},
+      {id:'c26',name:'صلاح بن عمر',           rank:'driver_heavy',present:true},
+      {id:'c27',name:'إبراهيم خالد',          rank:'driver_heavy',present:true},
+      {id:'c28',name:'كريم عطية',             rank:'driver_heavy',present:true},
+    ]
+  },
+  vehicles: {
+    A:[{id:'av1',type:'vl',name:'VL 01'},{id:'av2',type:'ambulance',name:'إسعاف 01'},{id:'av3',type:'truck',name:'شاحنة صهريج'}],
+    B:[{id:'bv1',type:'vl',name:'VL 02'},{id:'bv2',type:'ambulance',name:'إسعاف 02'},{id:'bv3',type:'truck',name:'شاحنة سلم'}],
+    C:[{id:'cv1',type:'vl',name:'VL 03'},{id:'cv2',type:'ambulance',name:'إسعاف 03'},{id:'cv3',type:'truck',name:'شاحنة مياه'}],
+  },
+  deleteTarget: null,
+  dragSrc: null,
+};
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function getSqForDay(date){
+  const base = new Date(BASE_DATE); base.setHours(0,0,0,0);
+  const t = new Date(date); t.setHours(0,0,0,0);
+  const diff = Math.round((t-base)/(86400000));
+  return SQUADRONS[((diff%3)+3)%3];
+}
+function todaySq(){ return getSqForDay(new Date()); }
+function getRank(id){ return RANKS.find(r=>r.id===id)||RANKS[3]; }
+function getVehType(id){ return VEH_TYPES.find(v=>v.id===id)||VEH_TYPES[0]; }
+function uid(){ return '_'+Math.random().toString(36).substr(2,9); }
+function setCSS(color){
+  document.documentElement.style.setProperty('--squad-color', color);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ALGORITHMS
+// ═══════════════════════════════════════════════════════════
+function distributeVehicles(sq){
+  const present = STATE.members[sq].filter(m=>m.present);
+  const avail = [...present];
+  function take(rankIds){
+    for(const rid of rankIds){
+      const idx = avail.findIndex(m=>m.rank===rid);
+      if(idx!==-1) return avail.splice(idx,1)[0];
+    }
+    return null;
+  }
+  return STATE.vehicles[sq].map(v=>{
+    let crew=[];
+    if(v.type==='vl'){
+      const d=take(['driver_light','driver_heavy']);
+      if(d) crew=[d];
+    } else if(v.type==='ambulance'){
+      const d=take(['driver_light','driver_heavy']);
+      const c=take(['corporal']);
+      const a1=take(['agent']); const a2=take(['agent']);
+      crew=[d,c,a1,a2].filter(Boolean);
+    } else {
+      const d=take(['driver_heavy','driver_light']);
+      const s=take(['sergeant']);
+      const c=take(['corporal']);
+      const a1=take(['agent']); const a2=take(['agent']);
+      crew=[d,s,c,a1,a2].filter(Boolean);
+    }
+    return {vehicle:v, crew};
+  });
+}
+function distributeGuard(sq){
+  const present = STATE.members[sq].filter(m=>m.present);
+  const pool = [
+    ...present.filter(m=>m.rank==='agent'),
+    ...present.filter(m=>m.rank==='corporal'),
+  ];
+  const result={};
+  GUARD_ORDER.forEach((pid,i)=>{ result[pid]=pool[i]||null; });
+  return result;
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function navigate(page){
+  STATE.page=page;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>{
+    const pages=['calendar','members','vehicles','distribution','reports'];
+    b.classList.toggle('active', pages[i]===page);
+  });
+  renderPage(page);
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER ENGINE
+// ═══════════════════════════════════════════════════════════
+function renderAll(){ renderPage(STATE.page); updateHeader(); }
+
+function updateHeader(){
+  const sq=todaySq(), col=SQ_COLORS[sq];
+  setCSS(col.bg);
+  const hdr=document.getElementById('header');
+  hdr.style.background=`linear-gradient(135deg,${col.dark},${col.bg})`;
+  hdr.style.boxShadow=`0 4px 20px ${col.bg}66`;
+  document.getElementById('header-badge').textContent=`الفصيلة ${sq} 🔥`;
+}
+
+function renderPage(page){
+  if(page==='calendar') renderCalendar();
+  else if(page==='members') renderMembers();
+  else if(page==='vehicles') renderVehicles();
+  else if(page==='distribution') renderDistribution();
+  else if(page==='reports') renderReports();
+}
+
+// ─── CALENDAR ────────────────────────────────────────────────
+function renderCalendar(){
+  const sq=todaySq(), col=SQ_COLORS[sq];
+  const today=new Date();
+  const y=STATE.calMonth.getFullYear(), m=STATE.calMonth.getMonth();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const firstDay=((new Date(y,m,1).getDay())+6)%7;
+
+  let daysHtml='';
+  for(let i=0;i<firstDay;i++) daysHtml+=`<div></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const dd=new Date(y,m,d);
+    const dsq=getSqForDay(dd), dc=SQ_COLORS[dsq];
+    const isToday=dd.toDateString()===today.toDateString();
+    daysHtml+=`<div class="cal-day${isToday?' today':''}" style="background:${dc.bg};${isToday?'box-shadow:0 0 8px '+dc.bg:''}">
+      <div class="cal-day-num">${d}</div>
+      <div class="cal-day-sq">${dsq}</div>
+    </div>`;
+  }
+
+  const todayStr=today.toLocaleDateString('ar-DZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  document.getElementById('page-calendar').innerHTML=`
+    <div class="card cal-banner" style="background:linear-gradient(135deg,${col.dark},${col.bg})">
+      <div class="cal-banner-label">الفصيلة المناوبة اليوم</div>
+      <div class="cal-banner-sq">الفصيلة ${sq}</div>
+      <div class="cal-banner-date">${todayStr}</div>
+    </div>
+    <div class="card">
+      <div class="cal-nav">
+        <button class="btn" style="background:#21262d" onclick="calPrev()">◀</button>
+        <span class="cal-nav-title">${MONTH_AR[m]} ${y}</span>
+        <button class="btn" style="background:#21262d" onclick="calNext()">▶</button>
+      </div>
+      <button class="btn btn-full" style="background:${col.bg};margin-bottom:12px;font-size:12px" onclick="calToday()">← العودة لليوم الحالي</button>
+      <div class="cal-grid" style="margin-bottom:4px">
+        ${DAY_AR.map(d=>`<div class="cal-day-header">${d}</div>`).join('')}
+      </div>
+      <div class="cal-grid">${daysHtml}</div>
+      <div class="cal-legend">
+        ${SQUADRONS.map(s=>`<div class="legend-item"><div class="legend-dot" style="background:${SQ_COLORS[s].bg}"></div>الفصيلة ${s}</div>`).join('')}
+      </div>
+    </div>`;
+}
+function calPrev(){ STATE.calMonth=new Date(STATE.calMonth.getFullYear(),STATE.calMonth.getMonth()-1,1); renderCalendar(); }
+function calNext(){ STATE.calMonth=new Date(STATE.calMonth.getFullYear(),STATE.calMonth.getMonth()+1,1); renderCalendar(); }
+function calToday(){ STATE.calMonth=new Date(); renderCalendar(); }
+
+// ─── MEMBERS ─────────────────────────────────────────────────
+function renderMembers(){
+  const sq=STATE.selectedSq, col=SQ_COLORS[sq];
+  const mlist=STATE.members[sq];
+  const presentCount=mlist.filter(m=>m.present).length;
+
+  const tabs=SQUADRONS.map(s=>`
+    <button class="squad-tab" style="${s===sq?`background:${SQ_COLORS[s].bg};color:#fff;box-shadow:0 4px 12px ${SQ_COLORS[s].bg}66`:''};"
+      onclick="selectSq('${s}','members')">${`الفصيلة ${s}`}</button>`).join('');
+
+  const memberRows=mlist.map((m,idx)=>{
+    const r=getRank(m.rank);
+    return `<div class="member-row" id="mrow-${m.id}" draggable="true"
+      ondragstart="dragStart(${idx})" ondragover="event.preventDefault();dragOver(${idx})" ondrop="dropMember(${idx})">
+      <span class="drag-handle">⠿</span>
+      <span class="dot" style="background:${r.color}"></span>
+      <div class="member-info">
+        <div class="member-name">${m.name}</div>
+        <span class="tag" style="background:${r.color}22;color:${r.color};border:1px solid ${r.color}44">${r.label}</span>
+      </div>
+      <button class="presence-btn" style="background:${m.present?'#2d9e4f22':'#e6394622'};color:${m.present?'#2d9e4f':'#e63946'};border-color:${m.present?'#2d9e4f44':'#e6394644'}"
+        onclick="togglePresence('${sq}','${m.id}')">${m.present?'حاضر':'غائب'}</button>
+      <button class="delete-btn" onclick="askDelete('member','${sq}','${m.id}','${m.name.replace(/'/g,"\\'")}')">✕</button>
+    </div>`;
+  }).join('');
+
+  const rankOptions=RANKS.map(r=>`<option value="${r.id}">${r.label}</option>`).join('');
+
+  document.getElementById('page-members').innerHTML=`
+    <div class="squad-tabs">${tabs}</div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span class="card-title" style="margin:0">الأفراد (${presentCount} حاضر / ${mlist.length})</span>
+        <button class="btn" style="background:${col.bg}" onclick="toggleAddMemberForm()">+ إضافة</button>
+      </div>
+      <div id="add-member-form" class="add-form hidden">
+        <input id="new-member-name" class="input-field" placeholder="الاسم الكامل"/>
+        <select id="new-member-rank" class="input-field">${rankOptions}</select>
+        <div class="form-row">
+          <button class="btn" style="background:${col.bg};flex:1" onclick="addMember('${sq}')">حفظ</button>
+          <button class="btn" style="background:#30363d;flex:1" onclick="toggleAddMemberForm()">إلغاء</button>
+        </div>
+      </div>
+      ${memberRows}
+    </div>`;
+}
+
+function selectSq(sq, page){ STATE.selectedSq=sq; renderPage(page); }
+function toggleAddMemberForm(){ document.getElementById('add-member-form').classList.toggle('hidden'); }
+function toggleAddVehicleForm(){ document.getElementById('add-vehicle-form').classList.toggle('hidden'); }
+
+function addMember(sq){
+  const name=document.getElementById('new-member-name').value.trim();
+  const rank=document.getElementById('new-member-rank').value;
+  if(!name) return;
+  STATE.members[sq].push({id:uid(),name,rank,present:true});
+  renderMembers();
+}
+function togglePresence(sq,id){
+  const m=STATE.members[sq].find(x=>x.id===id);
+  if(m) m.present=!m.present;
+  renderMembers();
+}
+// Drag & Drop
+function dragStart(idx){ STATE.dragSrc=idx; }
+function dragOver(idx){ STATE.dragOver=idx; }
+function dropMember(idx){
+  if(STATE.dragSrc===null||STATE.dragSrc===idx) return;
+  const sq=STATE.selectedSq, list=STATE.members[sq];
+  const [moved]=list.splice(STATE.dragSrc,1);
+  list.splice(idx,0,moved);
+  STATE.dragSrc=null; STATE.dragOver=null;
+  renderMembers();
+}
+
+// ─── VEHICLES ────────────────────────────────────────────────
+function renderVehicles(){
+  const sq=STATE.selectedSq, col=SQ_COLORS[sq];
+  const vlist=STATE.vehicles[sq];
+
+  const tabs=SQUADRONS.map(s=>`
+    <button class="squad-tab" style="${s===sq?`background:${SQ_COLORS[s].bg};color:#fff;box-shadow:0 4px 12px ${SQ_COLORS[s].bg}66`:''};"
+      onclick="selectSq('${s}','vehicles')">${`الفصيلة ${s}`}</button>`).join('');
+
+  const vehTypeOptions=VEH_TYPES.map(v=>`<option value="${v.id}">${v.label}</option>`).join('');
+
+  let vehicleRows='';
+  VEH_TYPES.forEach(vt=>{
+    const items=vlist.filter(v=>v.type===vt.id);
+    if(!items.length) return;
+    vehicleRows+=`<div class="section-title">${vt.icon} ${vt.label}</div>`;
+    items.forEach(v=>{
+      vehicleRows+=`<div class="vehicle-row">
+        <span class="vehicle-icon">${vt.icon}</span>
+        <span class="vehicle-name">${v.name}</span>
+        <span class="tag" style="background:${vt.color}22;color:${vt.color};border:1px solid ${vt.color}44">${vt.label}</span>
+        <button class="delete-btn" onclick="askDelete('vehicle','${sq}','${v.id}','${v.name.replace(/'/g,"\\'")}')">✕</button>
+      </div>`;
+    });
+  });
+
+  document.getElementById('page-vehicles').innerHTML=`
+    <div class="squad-tabs">${tabs}</div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span class="card-title" style="margin:0">المركبات (${vlist.length})</span>
+        <button class="btn" style="background:${col.bg}" onclick="toggleAddVehicleForm()">+ إضافة</button>
+      </div>
+      <div id="add-vehicle-form" class="add-form hidden">
+        <input id="new-vehicle-name" class="input-field" placeholder="اسم المركبة"/>
+        <select id="new-vehicle-type" class="input-field">${vehTypeOptions}</select>
+        <div class="form-row">
+          <button class="btn" style="background:${col.bg};flex:1" onclick="addVehicle('${sq}')">حفظ</button>
+          <button class="btn" style="background:#30363d;flex:1" onclick="toggleAddVehicleForm()">إلغاء</button>
+        </div>
+      </div>
+      ${vehicleRows||'<div style="color:#8b949e;text-align:center;padding:16px">لا توجد مركبات</div>'}
+    </div>`;
+}
+function addVehicle(sq){
+  const name=document.getElementById('new-vehicle-name').value.trim();
+  const type=document.getElementById('new-vehicle-type').value;
+  if(!name) return;
+  STATE.vehicles[sq].push({id:uid(),type,name});
+  renderVehicles();
+}
+
+// ─── DISTRIBUTION ─────────────────────────────────────────────
+function renderDistribution(){
+  const sq=todaySq(), col=SQ_COLORS[sq];
+  const assignments=distributeVehicles(sq);
+  const guard=distributeGuard(sq);
+  const dateStr=new Date().toLocaleDateString('ar-DZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  let vehHtml=assignments.map(a=>{
+    const vt=getVehType(a.vehicle.type);
+    const crewHtml=a.crew.length?a.crew.map(m=>{
+      const r=getRank(m.rank);
+      return `<div class="crew-chip">
+        <span class="dot" style="background:${r.color}"></span>
+        <span class="crew-name">${m.name}</span>
+        <span class="crew-rank" style="color:${r.color}">(${r.label})</span>
+      </div>`;
+    }).join(''):`<span style="color:#8b949e;font-size:12px">⚠️ لا يوجد طاقم كافٍ</span>`;
+    return `<div class="dist-vehicle">
+      <div class="dist-vehicle-header">
+        <span style="font-size:22px">${vt.icon}</span>
+        <span style="font-weight:700;font-size:14px">${a.vehicle.name}</span>
+        <span class="tag" style="background:${vt.color}22;color:${vt.color};border:1px solid ${vt.color}44">${vt.label}</span>
+      </div>
+      <div class="crew-wrap">${crewHtml}</div>
+    </div>`;
+  }).join('');
+
+  let guardHtml=GUARD_PERIODS.map(p=>{
+    const m=guard[p.id];
+    const r=m?getRank(m.rank):null;
+    const personHtml=m?`<div class="guard-person">
+      <span class="dot" style="background:${r.color}"></span>
+      <span style="font-size:12px">${m.name}</span>
+      <span style="font-size:10px;color:${r.color}">(${r.label})</span>
+    </div>`:`<span style="color:#e63946;font-size:12px">⚠️ غير مكتمل</span>`;
+    return `<div class="guard-row">
+      <div class="guard-num" style="background:${col.bg}">${p.id}</div>
+      <div class="guard-info">
+        <div class="guard-period">${p.label}</div>
+        <div class="guard-time">${p.time}</div>
+      </div>
+      ${personHtml}
+    </div>`;
+  }).join('');
+
+  document.getElementById('page-distribution').innerHTML=`
+    <div class="card" style="border-color:${col.bg}44;background:${col.dark}22">
+      <div style="font-size:13px;color:${col.light};font-weight:700;margin-bottom:4px">🔄 توزيع اليوم — الفصيلة ${sq}</div>
+      <div style="font-size:11px;color:#8b949e">${dateStr}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">🚒 توزيع الآليات</div>
+      ${vehHtml||'<div style="color:#8b949e;text-align:center;padding:16px">لا توجد آليات</div>'}
+    </div>
+    <div class="card">
+      <div class="card-title">🛡️ جدول الحراسة</div>
+      ${guardHtml}
+    </div>`;
+}
+
+// ─── REPORTS ──────────────────────────────────────────────────
+function renderReports(){
+  const sq=todaySq(), col=SQ_COLORS[sq];
+  const present=STATE.members[sq].filter(m=>m.present);
+  const assignments=distributeVehicles(sq);
+  const guard=distributeGuard(sq);
+
+  let membersByRank='';
+  RANKS.forEach(r=>{
+    const list=present.filter(m=>m.rank===r.id);
+    if(!list.length) return;
+    membersByRank+=`<div style="margin-bottom:10px">
+      <div class="section-title">${r.label} (${list.length})</div>
+      ${list.map(m=>`<div style="display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:4px;padding-right:4px">
+        <span class="dot" style="background:${r.color}"></span>${m.name}
+      </div>`).join('')}
+    </div>`;
+  });
+
+  document.getElementById('page-reports').innerHTML=`
+    <div class="card" style="border-color:${col.bg}44">
+      <div class="card-title">📊 ملخص اليوم — الفصيلة ${sq}</div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num" style="color:${col.bg}">${present.length}</div><div class="stat-label">حاضر</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:#2d9e4f">${STATE.vehicles[sq].length}</div><div class="stat-label">مركبة</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:#e9c46a">${assignments.length}</div><div class="stat-label">توزيع</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">👥 قائمة الحاضرين</div>
+      ${membersByRank}
+    </div>
+    <div class="card">
+      <div class="card-title">📤 تصدير ومشاركة</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-flex" style="background:#25d366" onclick="shareWhatsApp()">💬 مشاركة عبر واتساب</button>
+        <button class="btn btn-flex" style="background:#1d6fa4" onclick="copyReport()">📋 نسخ التقرير</button>
+      </div>
+    </div>`;
+}
+
+function buildReportText(bold){
+  const sq=todaySq();
+  const present=STATE.members[sq].filter(m=>m.present);
+  const assignments=distributeVehicles(sq);
+  const guard=distributeGuard(sq);
+  const b=bold?'*':'';
+  const lines=[
+    `📋 ${b}تقرير الحماية المدنية — الفصيلة ${sq}${b}`,
+    `📅 ${new Date().toLocaleDateString('ar-DZ')}`,
+    '',
+    `${b}👥 الأفراد الحاضرون:${b}`,
+    ...present.map(m=>`• ${m.name} — ${getRank(m.rank).label}`),
+    '',
+    `${b}🚒 توزيع الآليات:${b}`,
+    ...assignments.map(a=>`${getVehType(a.vehicle.type).icon} ${bold?'*':''}${a.vehicle.name}${bold?'*':''}: ${a.crew.map(c=>c.name).join(', ')}`),
+    '',
+    `${b}🛡️ الحراسة:${b}`,
+    ...GUARD_PERIODS.map(p=>{const m=guard[p.id];return `${p.label} (${p.time}): ${m?m.name:'⚠️ فارغ'}`;}),
+  ];
+  return lines.join('\n');
+}
+function shareWhatsApp(){ window.open('https://wa.me/?text='+encodeURIComponent(buildReportText(true)),'_blank'); }
+function copyReport(){
+  const txt=buildReportText(false);
+  if(navigator.share){ navigator.share({title:'تقرير الحماية المدنية',text:txt}); }
+  else if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(()=>alert('✅ تم نسخ التقرير!')); }
+  else { alert(txt); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// DELETE MODAL
+// ═══════════════════════════════════════════════════════════
+function askDelete(type,sq,id,name){
+  STATE.deleteTarget={type,sq,id};
+  document.getElementById('modal-msg').textContent=`هل أنت متأكد من حذف «${name}»؟`;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('show');
+  STATE.deleteTarget=null;
+}
+function confirmDelete(){
+  if(!STATE.deleteTarget) return;
+  const {type,sq,id}=STATE.deleteTarget;
+  if(type==='member') STATE.members[sq]=STATE.members[sq].filter(m=>m.id!==id);
+  else STATE.vehicles[sq]=STATE.vehicles[sq].filter(v=>v.id!==id);
+  closeModal();
+  renderPage(STATE.page);
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+updateHeader();
+renderCalendar();
+</script>
+</body>
+</html>
